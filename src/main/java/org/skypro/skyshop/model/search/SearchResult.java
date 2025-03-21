@@ -1,5 +1,4 @@
 package org.skypro.skyshop.model.search;
-
 import org.skypro.skyshop.model.article.Article;
 import org.skypro.skyshop.model.product.Product;
 

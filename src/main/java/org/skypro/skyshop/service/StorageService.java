@@ -4,7 +4,6 @@ import org.skypro.skyshop.model.search.Searchable;
 import org.skypro.skyshop.model.article.Article;
 import org.skypro.skyshop.model.product.Product;
 import org.springframework.stereotype.Service;
-
 import java.util.*;
 
 @Service

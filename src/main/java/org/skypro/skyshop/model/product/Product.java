@@ -1,7 +1,6 @@
 package org.skypro.skyshop.model.product;
 
 import org.skypro.skyshop.model.search.Searchable;
-
 import java.util.UUID;
 
 public class Product implements Searchable {
