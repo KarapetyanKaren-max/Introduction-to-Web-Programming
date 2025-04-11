@@ -22,11 +22,9 @@ import java.util.UUID;
 public class ShopController {
 
     private final BasketService basketService;
-    private final SearchService searchService;
 
     @Autowired
-    public ShopController(SearchService searchService, BasketService basketService) {
-        this.searchService = searchService;
+    public ShopController(BasketService basketService) {
         this.basketService = basketService;
     }
 
@@ -40,9 +38,4 @@ public class ShopController {
     public UserBasket getUserBasket() {
         return basketService.getUserBasket();
     }
-
-    @GetMapping("/search")
-    public Collection<SearchResult> search(@RequestParam String pattern) {
-        return searchService.search(pattern);
     }
-}
