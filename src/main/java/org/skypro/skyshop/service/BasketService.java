@@ -24,18 +24,26 @@ public class BasketService {
         this.storageService = storageService;
     }
 
-    public void addProductToBasket(UUID id) {
-        Optional<Product> product = storageService.getProductById(id);
-        if (!product.isPresent()) {
-            throw new IllegalArgumentException("Продукт не найден");
+    public void addProduct(UUID id) {
+        Optional<Product> productOptional = storageService.getProductById(id);
+        if (productOptional.isPresent()) {
+            productBasket.addProduct(id);
+        } else {
+            throw new IllegalArgumentException("Product not found");
         }
-        productBasket.addProduct(id);
     }
 
     public UserBasket getUserBasket() {
-        List<BasketItem> items = productBasket.getProducts().entrySet().stream()
-                .map(entry -> new BasketItem(storageService.getProductById(entry.getKey()).orElseThrow(), entry.getValue()))
+        Map<UUID, Integer> productsInBasket = productBasket.getProducts();
+
+        List<BasketItem> basketItems = productsInBasket.entrySet().stream()
+                .map(entry -> new BasketItem(storageService.getProductById(entry.getKey()).orElse(null), entry.getValue()))
                 .collect(Collectors.toList());
-        return new UserBasket(items);
+
+        double total = basketItems.stream()
+                .mapToDouble(item -> item.getProduct().getPrice() * item.getQuantity())
+                .sum();
+
+        return new UserBasket(basketItems, total);
     }
 }
