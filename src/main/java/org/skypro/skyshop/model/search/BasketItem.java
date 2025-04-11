@@ -1,4 +1,4 @@
-package org.skypro.skyshop.model.basket;
+package org.skypro.skyshop.model.search;
 
 import org.skypro.skyshop.model.product.Product;
 

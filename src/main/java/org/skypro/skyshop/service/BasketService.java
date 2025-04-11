@@ -1,9 +1,9 @@
 package org.skypro.skyshop.service;
 
-import org.skypro.skyshop.model.basket.BasketItem;
 import org.skypro.skyshop.model.basket.ProductBasket;
-import org.skypro.skyshop.model.basket.UserBasket;
 import org.skypro.skyshop.model.product.Product;
+import org.skypro.skyshop.model.search.UserBasket;
+import org.skypro.skyshop.model.search.BasketItem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,7 +24,7 @@ public class BasketService {
         this.storageService = storageService;
     }
 
-    public void addProduct(UUID id) {
+    public void addProductToBasket(UUID id) {
         Optional<Product> productOptional = storageService.getProductById(id);
         if (productOptional.isPresent()) {
             productBasket.addProduct(id);
@@ -34,9 +34,8 @@ public class BasketService {
     }
 
     public UserBasket getUserBasket() {
-        Map<UUID, Integer> productsInBasket = productBasket.getProducts();
-
-        List<BasketItem> basketItems = productsInBasket.entrySet().stream()
+        Map<UUID, Integer> items = productBasket.getItems();
+        List<BasketItem> basketItems = items.entrySet().stream()
                 .map(entry -> new BasketItem(storageService.getProductById(entry.getKey()).orElse(null), entry.getValue()))
                 .collect(Collectors.toList());
 

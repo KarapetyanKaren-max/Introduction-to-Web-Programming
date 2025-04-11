@@ -1,4 +1,4 @@
-package org.skypro.skyshop.model.basket;
+package org.skypro.skyshop.model.search;
 
 import java.util.List;
 
