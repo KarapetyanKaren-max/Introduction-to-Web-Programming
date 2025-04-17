@@ -9,8 +9,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+
 @Component
-@Scope("session")
+@Scope(value = "session", proxyMode = ScopedProxyMode.TARGET_CLASS)
 public class ProductBasket {
     private final Map<UUID, Integer> items = new HashMap<>();
 

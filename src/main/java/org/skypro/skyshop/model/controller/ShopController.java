@@ -11,6 +11,7 @@ import java.util.Collection;
 import java.util.UUID;
 
 @RestController
+@RequestMapping("/shop")
 public class ShopController {
     private final SearchService searchService;
     private final BasketService basketService;
