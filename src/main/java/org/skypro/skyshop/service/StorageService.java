@@ -39,7 +39,7 @@ public class StorageService {
 
     public List<Searchable> getSearchableItems() {
         List<Searchable> searchableItems = new ArrayList<>();
-        searchableItems.addAll(productStorage.values());
+        searchableItems.addAll((Collection<? extends Searchable>) productStorage.values());
         searchableItems.addAll(articleStorage.values());
         return searchableItems;
     }
