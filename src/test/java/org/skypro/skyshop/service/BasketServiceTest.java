@@ -1,13 +1,18 @@
 package org.skypro.skyshop.service;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.skypro.skyshop.exception.NoSuchProductException;
+import org.skypro.skyshop.model.basket.ProductBasket;
 import org.skypro.skyshop.model.product.Product;
+import org.skypro.skyshop.model.search.UserBasket;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -31,13 +36,14 @@ public class BasketServiceTest {
     }
 
     @Test
+    @DisplayName("Выбрасывает исключение если добавляется не сушествуюший продукт")
     public void testAddNonExistentProductThrowsException() {
         UUID nonExistentProductId = UUID.randomUUID();
 
         when(storageService.getProductById(nonExistentProductId)).thenReturn(Optional.empty());
 
-        Exception exception = assertThrows(ProductNotFoundException.class, () -> {
-            basketService.addProduct(nonExistentProductId);
+        Exception exception = assertThrows(NoSuchProductException.class, () -> {
+            basketService.addProductToBasket(nonExistentProductId);
         });
 
         assertEquals("Product not found", exception.getMessage());
@@ -47,37 +53,45 @@ public class BasketServiceTest {
 
     @Test
     public void testAddExistingProductCallsAddProductOnBasket() {
-        UUID existingProductId = UUID.randomUUID();
 
-        Product product = new Product(existingProductId, "Milk", "Fresh cow milk", 50);
+        Product product = new Product("Milk", "Fresh cow milk", 50);
 
-        when(storageService.getProductById(existingProductId)).thenReturn(Optional.of(product));
+        when(storageService.getProductById(product.getId())).thenReturn(Optional.of(product));
 
-        basketService.addProduct(existingProductId);
+        basketService.addProductToBasket(product.getId());
 
-        verify(productBasket).addProduct(product);
+        verify(productBasket).addProduct(product.getId());
     }
 
     @Test
     public void testGetUserBasketReturnsEmptyWhenBasketIsEmpty() {
-        when(productBasket.getProducts()).thenReturn(List.of()); // Добавлено
+        when(productBasket.getItems()).thenReturn(Map.of());
 
-        Basket basket = basketService.getUserBasket();
+        UserBasket basket = basketService.getUserBasket();
 
-        assertTrue(basket.isEmpty(), "Expected empty basket");
-        verify(productBasket).getProducts();
+        assertNotNull(basket);
+        assertTrue(basket.getItems().isEmpty());
+        assertEquals(0, basket.getTotal());
+
+        verify(productBasket,only()).getItems();
     }
 
     @Test
     public void testGetUserBasketReturnsProductsWhenBasketIsNotEmpty() {
-        Product product1 = new Product(UUID.randomUUID(), "Milk", "Fresh cow milk", 50);
-        Product product2 = new Product(UUID.randomUUID(), "Bread", "Fresh bread", 30);
+        Product product1 = new Product( "Milk", "Fresh cow milk", 50);
+        Product product2 = new Product( "Bread", "Fresh bread", 30);
 
-        when(productBasket.getProducts()).thenReturn(List.of(product1, product2));
+        when(productBasket.getItems()).thenReturn(Map.of(product1.getId(),1, product2.getId(),1));
+        when(storageService.getProductById(product1.getId())).thenReturn(Optional.of(product1));
+        when(storageService.getProductById(product2.getId())).thenReturn(Optional.of(product2));
+        UserBasket basket = basketService.getUserBasket();
 
-        Basket basket = basketService.getUserBasket();
+        assertNotNull(basket);
+        assertEquals(2, basket.getItems().size());
+        assertEquals(product1.getPrice()+product2.getPrice(), basket.getTotal());
 
-        assertFalse(basket.isEmpty(), "Expected non-empty basket");
-        assertEquals(2, basket.size());
+        verify(productBasket,only()).getItems();
+        verify(storageService,times(2)).getProducts();
+
     }
 }
